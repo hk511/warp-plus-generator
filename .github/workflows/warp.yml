@@ -1,16 +1,35 @@
-name: WARP+ Key Auto Generator
+name: Generate WARP+ Key
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # 每天自动执行
+    - cron: '0 0 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate WARP+ Key
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3
-          curl -sSL https://raw.githubusercontent.com/fscarmen/warp/main/warp-go/warp.py -o warp.py
-          python3 warp.py --key --update
+          sudo apt install -y curl python3 git
+
+      - name: Download warp script
+        run: |
+          curl -sSL https://raw.githubusercontent.com/fscarmen/warp/main/menu.sh -o menu.sh
+          chmod +x menu.sh
+
+      - name: Run warp+ generator
+        run: |
+          echo "Generating WARP+ Key..."
+          bash menu.sh -u > output.txt || true
+          cat output.txt | grep "License key" || true
+
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: warp-plus-key
+          path: output.txt
