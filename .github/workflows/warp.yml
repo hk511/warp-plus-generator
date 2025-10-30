@@ -1,0 +1,16 @@
+name: WARP+ Key Auto Generator
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # 每天自动执行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate WARP+ Key
+        run: |
+          sudo apt update
+          sudo apt install -y python3
+          curl -sSL https://raw.githubusercontent.com/fscarmen/warp/main/warp-go/warp.py -o warp.py
+          python3 warp.py --key --update
